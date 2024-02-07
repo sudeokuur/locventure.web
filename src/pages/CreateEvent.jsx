@@ -1,4 +1,3 @@
-// Home.js
 import React, { useRef, useState } from 'react';
 import { addDoc, collection } from '@firebase/firestore';
 import { firestore } from '../firebase';
@@ -44,6 +43,8 @@ const DatePickerContainer = styled.div`
 
 const TimePickerContainer = styled.div`
   margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Button = styled.button`
@@ -60,13 +61,19 @@ const SuccessMessage = styled.div`
   color: #4caf50; /* Green color for success message */
 `;
 
+const EventTypeSelect = styled(Select)`
+  margin-bottom: 16px;
+`;
+
 const CreateEvent = () => {
   const dateRef = useRef();
-  const timeRef = useRef();
+  const hourRef = useRef();
+  const minuteRef = useRef();
   const descRef = useRef();
   const cityRef = useRef();
   const districtRef = useRef();
   const nameRef = useRef();
+  const eventTypeRef = useRef(); // Reference for event type dropdown
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCity, setSelectedCity] = useState('');
@@ -79,10 +86,11 @@ const CreateEvent = () => {
 
     let data = {
       eventDate: selectedDate,
-      eventTime: timeRef.current.value,
+      eventTime: `${hourRef.current.value}:${minuteRef.current.value}`,
       eventDescription: descRef.current.value,
       eventLocation: `${selectedCity}, ${districtRef.current.value}`, // Combine city and district
       eventName: nameRef.current.value,
+      eventType: eventTypeRef.current.value // Get the selected event type
     };
 
     try {
@@ -91,11 +99,13 @@ const CreateEvent = () => {
       console.log('Document successfully written!');
       // Optionally, clear the form fields after successful submission
       setSelectedDate(null);
-      timeRef.current.value = '';
+      hourRef.current.value = '';
+      minuteRef.current.value = '';
       descRef.current.value = '';
       cityRef.current.value = '';
       districtRef.current.value = '';
       nameRef.current.value = '';
+      eventTypeRef.current.value = ''; // Reset the event type dropdown
       setSuccessMessage('Event successfully saved!');
     } catch (error) {
       console.error('Error writing document: ', error);
@@ -123,7 +133,9 @@ const CreateEvent = () => {
       </DatePickerContainer>
       <Label>Enter Event Time</Label>
       <TimePickerContainer>
-        <Input type="time" ref={timeRef} required />
+        <Input type="number" ref={hourRef} placeholder="Hour" min="0" max="23" required />
+        <span>:</span>
+        <Input type="number" ref={minuteRef} placeholder="Minute" min="0" max="59" required />
       </TimePickerContainer>
       <Label>Select City</Label>
       <Select ref={cityRef} onChange={handleCityChange} required>
@@ -150,6 +162,17 @@ const CreateEvent = () => {
               </option>
             ))}
       </Select>
+      <Label>Select Event Type</Label>
+      <EventTypeSelect ref={eventTypeRef} required>
+        <option value="" disabled selected>
+          Select an event type
+        </option>
+        <option value="concert">Concert</option>
+        <option value="theatre">Theatre</option>
+        <option value="sport">Sport</option>
+        <option value="dinner">Dinner</option>
+        <option value="festival">Festival</option>
+      </EventTypeSelect>
       <Label>Enter Event Description</Label>
       <Input type="text" ref={descRef} required />
 
