@@ -62,6 +62,7 @@ const CreatedEvents = () => {
       // Reset editableEvent state and reload events
       setEditableEvent(null);
       loadEvents();
+      //test2 for new pc 
     }
   };
 
