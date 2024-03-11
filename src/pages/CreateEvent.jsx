@@ -1,10 +1,11 @@
+import { addDoc, collection, doc, updateDoc } from '@firebase/firestore';
+import { getDownloadURL, getStorage, ref, uploadBytes } from '@firebase/storage';
 import React, { useRef, useState } from 'react';
-import { addDoc, collection } from '@firebase/firestore';
-import { firestore } from '../firebase';
-import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import styled from 'styled-components';
 import { citiesInTurkey } from '../cities';
+import { firestore } from '../firebase';
 
 const FormContainer = styled.form`
   display: flex;
@@ -66,6 +67,8 @@ const EventTypeSelect = styled(Select)`
 `;
 
 const CreateEvent = () => {
+  const [image, setImage] = useState(null);
+  const imageInputRef = useRef(null);
   const dateRef = useRef();
   const hourRef = useRef();
   const minuteRef = useRef();
@@ -73,31 +76,44 @@ const CreateEvent = () => {
   const cityRef = useRef();
   const districtRef = useRef();
   const nameRef = useRef();
-  const eventTypeRef = useRef(); // Reference for event type dropdown
+  const eventTypeRef = useRef();
+  const storageRef = useRef();
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCity, setSelectedCity] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const ref = collection(firestore, 'events');
+  const eventRef = collection(firestore, 'events');
+  const storage = getStorage();
 
   const handleSave = async (e) => {
     e.preventDefault();
-
-    let data = {
-      eventDate: selectedDate,
-      eventTime: `${hourRef.current.value}:${minuteRef.current.value}`,
-      eventDescription: descRef.current.value,
-      eventLocation: `${selectedCity}, ${districtRef.current.value}`, // Combine city and district
-      eventName: nameRef.current.value,
-      eventType: eventTypeRef.current.value // Get the selected event type
-    };
-
+  
     try {
-      // Use await to handle the promise
-      await addDoc(ref, data);
-      console.log('Document successfully written!');
-      // Optionally, clear the form fields after successful submission
+      const eventData = {
+        eventDate: selectedDate,
+        eventTime: `${hourRef.current.value}:${minuteRef.current.value}`,
+        eventDescription: descRef.current.value,
+        eventLocation: `${selectedCity}, ${districtRef.current.value}`,
+        eventName: nameRef.current.value,
+        eventType: eventTypeRef.current.value,
+        eventImage: imageInputRef.current.value
+      };
+  
+      const docRef = await addDoc(eventRef, eventData);
+  
+      if (image) {
+        const storageRef = ref(storage, `event_images/${docRef.id}_${image.name}`);
+        await uploadBytes(storageRef, image);
+        const downloadURL = await getDownloadURL(storageRef);
+        await updateDoc(doc(docRef.id), {
+          eventImage: downloadURL
+        });
+        console.log('Image uploaded successfully!');
+      }
+  
+      console.log('Document written with ID: ', docRef.id);
+      setSuccessMessage('Event successfully saved!');
       setSelectedDate(null);
       hourRef.current.value = '';
       minuteRef.current.value = '';
@@ -105,12 +121,16 @@ const CreateEvent = () => {
       cityRef.current.value = '';
       districtRef.current.value = '';
       nameRef.current.value = '';
-      eventTypeRef.current.value = ''; // Reset the event type dropdown
-      setSuccessMessage('Event successfully saved!');
+      eventTypeRef.current.value = '';
+      imageInputRef.current.value = '';
     } catch (error) {
-      console.error('Error writing document: ', error);
+      console.error('Error adding document: ', error);
       setSuccessMessage('Error saving event. Please try again.');
     }
+  };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
   };
 
   const handleCityChange = (e) => {
@@ -175,7 +195,10 @@ const CreateEvent = () => {
       </EventTypeSelect>
       <Label>Enter Event Description</Label>
       <Input type="text" ref={descRef} required />
-
+      
+      <Label>Upload Event Image</Label>
+      <Input type="file" accept="image/*" ref={imageInputRef} onChange={handleImageChange} />
+      
       <Button type="submit">Save</Button>
       {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
     </FormContainer>
