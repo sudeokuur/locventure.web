@@ -1,5 +1,5 @@
-import { addDoc, collection, doc, updateDoc } from '@firebase/firestore';
-import { getDownloadURL, getStorage, ref, uploadBytes } from '@firebase/storage';
+import { addDoc, collection } from '@firebase/firestore';
+import { getStorage } from '@firebase/storage';
 import React, { useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -97,20 +97,10 @@ const CreateEvent = () => {
         eventLocation: `${selectedCity}, ${districtRef.current.value}`,
         eventName: nameRef.current.value,
         eventType: eventTypeRef.current.value,
-        eventImage: imageInputRef.current.value
+        eventImage: image ? await convertImageToBase64(image) : null
       };
   
       const docRef = await addDoc(eventRef, eventData);
-  
-      if (image) {
-        const storageRef = ref(storage, `event_images/${docRef.id}_${image.name}`);
-        await uploadBytes(storageRef, image);
-        const downloadURL = await getDownloadURL(storageRef);
-        await updateDoc(doc(docRef.id), {
-          eventImage: downloadURL
-        });
-        console.log('Image uploaded successfully!');
-      }
   
       console.log('Document written with ID: ', docRef.id);
       setSuccessMessage('Event successfully saved!');
@@ -127,6 +117,17 @@ const CreateEvent = () => {
       console.error('Error adding document: ', error);
       setSuccessMessage('Error saving event. Please try again.');
     }
+  };
+  
+  const convertImageToBase64 = (imageFile) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(imageFile);
+    });
   };
   const handleImageChange = (e) => {
     const file = e.target.files[0];
