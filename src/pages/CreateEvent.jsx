@@ -188,11 +188,14 @@ const CreateEvent = () => {
         <option value="" disabled selected>
           Select an event type
         </option>
-        <option value="concert">Concert</option>
-        <option value="theatre">Theatre</option>
-        <option value="sport">Sport</option>
-        <option value="dinner">Dinner</option>
-        <option value="festival">Festival</option>
+        <option value="Party">Concert</option>
+        <option value="Concert">Concert</option>
+        <option value="Theater">Theatre</option>
+        <option value="Camping">Camping</option>
+        <option value="FamilyFriendly">Family Friendly</option>
+        <option value="Sport">Sport</option>
+        <option value="Festival">Festival</option>
+        <option value="Outdoor">Outdoor</option>
       </EventTypeSelect>
       <Label>Enter Event Description</Label>
       <Input type="text" ref={descRef} required />
