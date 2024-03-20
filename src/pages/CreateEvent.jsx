@@ -15,8 +15,8 @@ const FormContainer = styled.form`
   padding: 200px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  background-color: #27055B; 
-  color: #fff; 
+  background-color: #ffffff; /* Arka plan beyaz */
+  color: #000000; /* Yazı rengi siyah */
 `;
 
 const Label = styled.label`
@@ -29,6 +29,7 @@ const Input = styled.input`
   margin-bottom: 16px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  width: 200px; /* Örneğin, genişliği ayarlayabilirsiniz */
 `;
 
 const Select = styled.select`
@@ -46,11 +47,15 @@ const TimePickerContainer = styled.div`
   margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
+
+  /* Yeni eklenen stil */
+  align-items: center;
+  width: 100px; /* Örneğin, genişliği ayarlayabilirsiniz */
 `;
 
 const Button = styled.button`
   padding: 10px;
-  background-color: #007bff;
+  background-color: #27055B; /* Lacivert */
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -82,6 +87,7 @@ const CreateEvent = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCity, setSelectedCity] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const eventRef = collection(firestore, 'events');
   const storage = getStorage();
@@ -89,6 +95,20 @@ const CreateEvent = () => {
   const handleSave = async (e) => {
     e.preventDefault();
   
+    if (
+      !nameRef.current.value ||
+      !selectedDate ||
+      !hourRef.current.value ||
+      !minuteRef.current.value ||
+      !selectedCity ||
+      !districtRef.current.value ||
+      !eventTypeRef.current.value ||
+      !descRef.current.value ||
+      !image
+    ) {
+      setErrorMessage('Please fill out all required fields.');
+      return;
+    }
     try {
       const eventData = {
         eventDate: selectedDate,
@@ -99,9 +119,9 @@ const CreateEvent = () => {
         eventType: eventTypeRef.current.value,
         eventImage: image ? await convertImageToBase64(image) : null
       };
-  
+
       const docRef = await addDoc(eventRef, eventData);
-  
+
       console.log('Document written with ID: ', docRef.id);
       setSuccessMessage('Event successfully saved!');
       setSelectedDate(null);
@@ -113,6 +133,7 @@ const CreateEvent = () => {
       nameRef.current.value = '';
       eventTypeRef.current.value = '';
       imageInputRef.current.value = '';
+      setErrorMessage('');
     } catch (error) {
       console.error('Error adding document: ', error);
       setSuccessMessage('Error saving event. Please try again.');
@@ -139,6 +160,7 @@ const CreateEvent = () => {
   };
 
   return (
+    
     <FormContainer onSubmit={handleSave}>
       <Label>Enter Event Name</Label>
       <Input type="text" ref={nameRef} required />
