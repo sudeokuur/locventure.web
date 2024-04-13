@@ -1,11 +1,12 @@
 import { addDoc, collection } from '@firebase/firestore';
-import { getStorage } from '@firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytes } from '@firebase/storage';
 import React, { useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
 import { citiesInTurkey } from '../cities';
 import { firestore } from '../firebase';
+
 
 const FormContainer = styled.form`
   display: flex;
@@ -91,54 +92,74 @@ const CreateEvent = () => {
 
   const eventRef = collection(firestore, 'events');
   const storage = getStorage();
-
   const handleSave = async (e) => {
     e.preventDefault();
-  
-    if (
-      !nameRef.current.value ||
-      !selectedDate ||
-      !hourRef.current.value ||
-      !minuteRef.current.value ||
-      !selectedCity ||
-      !districtRef.current.value ||
-      !eventTypeRef.current.value ||
-      !descRef.current.value ||
-      !image
-    ) {
-      setErrorMessage('Please fill out all required fields.');
-      return;
-    }
+    
+    console.log('handleSave function called');
+    
     try {
+      if (
+        !nameRef.current.value ||
+        !selectedDate ||
+        !hourRef.current.value ||
+        !minuteRef.current.value ||
+        !selectedCity ||
+        !districtRef.current.value ||
+        !eventTypeRef.current.value ||
+        !descRef.current.value ||
+        !image
+      ) {
+        console.log('One or more required fields are empty:');
+        console.log('Name:', nameRef.current.value);
+        console.log('Date:', selectedDate);
+        console.log('Hour:', hourRef.current.value);
+        console.log('Minute:', minuteRef.current.value);
+        console.log('City:', selectedCity);
+        console.log('District:', districtRef.current.value);
+        console.log('Event Type:', eventTypeRef.current.value);
+        console.log('Description:', descRef.current.value);
+        console.log('Image:', image);
+        
+        setErrorMessage('Please fill out all required fields.');
+        return;
+      }
+      
+      const storageRef = ref(storage, `event_images/${image.name}`);
+      await uploadBytes(storageRef, image);
+  
+      const imageUrl = await getDownloadURL(storageRef);
+  
       const eventData = {
+        eventName: nameRef.current.value,
         eventDate: selectedDate,
         eventTime: `${hourRef.current.value}:${minuteRef.current.value}`,
-        eventDescription: descRef.current.value,
         eventLocation: `${selectedCity}, ${districtRef.current.value}`,
-        eventName: nameRef.current.value,
         eventType: eventTypeRef.current.value,
-        eventImage: image ? await convertImageToBase64(image) : null
+        eventDescription: descRef.current.value,
+        eventImage: imageUrl,
       };
-
-      const docRef = await addDoc(eventRef, eventData);
-
-      console.log('Document written with ID: ', docRef.id);
+  
+      await addDoc(eventRef, eventData);
+  
       setSuccessMessage('Event successfully saved!');
+      setErrorMessage('');
       setSelectedDate(null);
       hourRef.current.value = '';
       minuteRef.current.value = '';
+      nameRef.current.value = '';
       descRef.current.value = '';
       cityRef.current.value = '';
       districtRef.current.value = '';
-      nameRef.current.value = '';
       eventTypeRef.current.value = '';
+      setImage(null);
       imageInputRef.current.value = '';
-      setErrorMessage('');
     } catch (error) {
       console.error('Error adding document: ', error);
-      setSuccessMessage('Error saving event. Please try again.');
+      setSuccessMessage('');
+      setErrorMessage('Error saving event. Please try again.');
     }
   };
+
   
   const convertImageToBase64 = (imageFile) => {
     return new Promise((resolve, reject) => {
@@ -214,7 +235,7 @@ const CreateEvent = () => {
         <option value="Concert">Concert</option>
         <option value="Theater">Theatre</option>
         <option value="Camping">Camping</option>
-        <option value="FamilyFriendly">Family Friendly</option>
+        <option value="Family Friendly">Family Friendly</option>
         <option value="Sport">Sport</option>
         <option value="Festival">Festival</option>
         <option value="Outdoor">Outdoor</option>

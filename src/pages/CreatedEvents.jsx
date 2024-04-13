@@ -28,6 +28,7 @@ const TableHeader = styled.th`
 
 const TableCell = styled.td`
   padding: 10px;
+  color: ${(props) => (props.current ? '#00cc00' : '#00008b')};
 `;
 
 const PageTitle = styled.h1`
@@ -93,11 +94,7 @@ const CreatedEvents = () => {
     const currentDate = new Date();
     const eventDateTime = eventDate.toDate();
     
-    if (eventDateTime > currentDate) {
-      return 'Visible';
-    } else {
-      return 'Done';
-    }
+    return eventDateTime > currentDate ? 'CURRENT' : 'PAST';
   };
 
   return (
@@ -131,7 +128,9 @@ const CreatedEvents = () => {
               <TableCell>{event.eventLocation}</TableCell>
               <TableCell>{event.eventType}</TableCell>
               <TableCell>{formatDate(event.eventDate)}</TableCell>
-              <TableCell>{event.status}</TableCell>
+              <TableCell current={getStatus(event.eventDate) === 'CURRENT'}>
+                {getStatus(event.eventDate)}
+              </TableCell>
             </TableRow>
           ))}
         </tbody>
