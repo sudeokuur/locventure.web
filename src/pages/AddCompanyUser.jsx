@@ -1,9 +1,21 @@
-import firebase from 'firebase/compat/app';
-import React, { useEffect, useState } from 'react';
+import { initializeApp } from 'firebase/app';
+import { addDoc, collection, getDocs, getFirestore } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { Tab, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css'; // Import CSS for react-tabs
 import styled from 'styled-components';
-  
+
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyA0pvc_FKN-c5qsY_Lb4tqVGDtK7pz3fbg",
+  authDomain: "localeventure.firebaseapp.com",
+  projectId: "localeventure",
+  storageBucket: "localeventure.appspot.com",
+  messagingSenderId: "952018081316",
+  appId: "1:952018081316:web:d8898e7156da39fb682ab1",
+  measurementId: "G-CDHGZRJMTL"
+};
+initializeApp(firebaseConfig);
 
 const Container = styled.div`
   max-width: 600px;
@@ -48,8 +60,9 @@ const AddCompanyUser = () => {
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      const snapshot = await firebase.firestore().collection('companies').get();
-      const companiesData = snapshot.docs.map(doc => ({
+      const db = getFirestore();
+      const querySnapshot = await getDocs(collection(db, 'companies'));
+      const companiesData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
@@ -60,7 +73,8 @@ const AddCompanyUser = () => {
 
   const handleAddCompany = async () => {
     try {
-      const docRef = await firebase.firestore().collection('companies').add({
+      const db = getFirestore();
+      const docRef = await addDoc(collection(db, 'companies'), {
         companyName: companyName,
       });
       const companyId = docRef.id;
@@ -73,7 +87,8 @@ const AddCompanyUser = () => {
 
   const handleAddUser = async () => {
     try {
-      await firebase.firestore().collection('users').add({
+      const db = getFirestore();
+      await addDoc(collection(db, 'users'), {
         companyId: selectedCompany,
         username: username,
         password: password,
@@ -105,38 +120,38 @@ const AddCompanyUser = () => {
           </FormContainer>
         </Tab>
         <Tab label="User">
-  <FormContainer>
-    <FormTitle>Add User</FormTitle>
-    <FormGroup>
-      <select
-        value={selectedCompany}
-        onChange={(e) => setSelectedCompany(e.target.value)}
-      >
-        <option value="">Select Company</option>
-        {companies.map(company => (
-          <option key={company.id} value={company.id}>{company.companyName}</option>
-        ))}
-      </select>
-    </FormGroup>
-    <FormGroup>
-      <Input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-      />
-    </FormGroup>
-    <FormGroup>
-      <Input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-    </FormGroup>
-    <Button onClick={handleAddUser}>Save User</Button>
-  </FormContainer>
-</Tab>
+          <FormContainer>
+            <FormTitle>Add User</FormTitle>
+            <FormGroup>
+              <select
+                value={selectedCompany}
+                onChange={(e) => setSelectedCompany(e.target.value)}
+              >
+                <option value="">Select Company</option>
+                {companies.map(company => (
+                  <option key={company.id} value={company.id}>{company.companyName}</option>
+                ))}
+              </select>
+            </FormGroup>
+            <FormGroup>
+              <Input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+              />
+            </FormGroup>
+            <FormGroup>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+              />
+            </FormGroup>
+            <Button onClick={handleAddUser}>Save User</Button>
+          </FormContainer>
+        </Tab>
       </Tabs>
     </Container>
   );
