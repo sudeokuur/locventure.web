@@ -106,7 +106,7 @@ const CreatedEvents = () => {
     try {
       const eventDocRef = doc(firestore, 'events', editEvent.id);
       await updateDoc(eventDocRef, {
-        eventName: editEvent.eventName,
+        eventDate: editEvent.eventName,
         eventLocation: editEvent.eventLocation,
         eventType: editEvent.eventType,
         eventDate: editEvent.eventDate,

@@ -70,7 +70,9 @@ const Menu = () => {
       <Sidebar isOpen={isOpen}>
         <SidebarLink to="/create-event">Create Event</SidebarLink>
         <SidebarLink to="/created-event">Created Event</SidebarLink>
+        <SidebarLink to="/statistics">Statistics</SidebarLink>
         <SidebarLink to="/add-company-user">Add Company & User</SidebarLink>
+
       </Sidebar>
       <PageContainer>
         {/* Content goes here */}
