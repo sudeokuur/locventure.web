@@ -1,27 +1,19 @@
 // cities.js
 export const citiesInTurkey = [
   {
-    city: 'Adana',
-    districts: ['District1', 'District2', 'District3'],
-  },
-  {
     city: 'Ankara',
-    districts: ['Çankaya', 'Keçiören', 'Mamak'],
-  },
-  {
-    city: 'Antalya',
-    districts: ['DistrictX', 'DistrictY', 'DistrictZ'],
-  },
-  {
-    city: 'Bursa',
-    districts: ['DistrictI', 'DistrictII', 'DistrictIII'],
-  },
-  {
-    city: 'Denizli',
-    districts: ['DistrictAlpha', 'DistrictBeta', 'DistrictGamma'],
+    districts: ['Çankaya', 'Keçiören', 'Mamak', 'Altındağ', 'Etimesgut', 'Sincan', 'Yenimahalle', 'Akyurt', 'Ayaş', 'Bala', 'Beypazarı', 'Çamlıdere', 'Çubuk', 'Elmadağ', 'Evren', 'Gölbaşı', 'Güdül', 'Haymana', 'Kalecik', 'Kazan', 'Kızılcahamam', 'Nallıhan', 'Polatlı', 'Şereflikoçhisar'] ,
   },
   {
     city: 'İstanbul',
-    districts: ['Kadıköy', 'Üsküdar', 'Ümraniye', 'Beşiktaş', /* Add more districts as needed */],
+    districts: ['Arnavutköy', 'Avcılar','Bağcılar','Bahçelievler','Bakırköy','Başakşehir','Bayrampaşa','Beşiktaş','Beylikdüzü','Beyoğlu','Büyükçekmece','Çatalca','Esenler','Esenyurt','Eyüpsultan','Fatih','Gaziosmanpaşa','Güngören','Kâğıthane','Küçükçekmece','Sarıyer','Silivri',
+    'Sultangazi','Şişli','Zeytinburnu','Adalar',
+    'Ataşehir','Beykoz','Çekmeköy','Kadıköy','Kartal',
+    'Maltepe','Pendik','Sancaktepe',
+    '	Sultanbeyli','Şile','Tuzla','Ümraniye','Üsküdar',]/* Add more districts as needed */,
+  },
+  {
+    city: 'İzmir',
+    districts: ['Buca', 'Foça', 'Çeşme', 'Bornova', 'Balçova', 'Çiğli', 'Gaziemir', 'Güzelbahçe', 'Karşıyaka', 'Dikili', 'Menderes', 'Urla' /* Add more districts as needed */],
   },
 ];

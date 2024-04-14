@@ -55,11 +55,29 @@ const MenuIcon = styled.span`
   font-size: 24px;
 `;
 
+const LogoutButton = styled.button`
+  display: block;
+  padding: 16px;
+  color: #fff;
+  background-color: #111827; /* Lacivert */
+  border: none;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+`;
+
 const Menu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleLogout = () => {
+    // Perform logout actions
+    // For example, clear session or token
+    // Then redirect to the login page
+    window.location.href = '/'; // Redirect to login page
   };
 
   return (
@@ -72,7 +90,8 @@ const Menu = () => {
         <SidebarLink to="/created-event">Created Event</SidebarLink>
         <SidebarLink to="/statistics">Statistics</SidebarLink>
         <SidebarLink to="/add-company-user">Add Company & User</SidebarLink>
-
+        {/* Logout Button */}
+        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       </Sidebar>
       <PageContainer>
         {/* Content goes here */}
@@ -80,5 +99,4 @@ const Menu = () => {
     </React.Fragment>
   );
 };
-
 export default Menu;
