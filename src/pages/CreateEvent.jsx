@@ -1,5 +1,4 @@
 import { addDoc, collection } from '@firebase/firestore';
-import { getStorage } from '@firebase/storage';
 import React, { useRef, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -47,8 +46,6 @@ const TimePickerContainer = styled.div`
   margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
-
-  /* Yeni eklenen stil */
   align-items: center;
   width: 100px; /* Örneğin, genişliği ayarlayabilirsiniz */
 `;
@@ -74,7 +71,6 @@ const EventTypeSelect = styled(Select)`
 const CreateEvent = () => {
   const [image, setImage] = useState(null);
   const imageInputRef = useRef(null);
-  const dateRef = useRef();
   const hourRef = useRef();
   const minuteRef = useRef();
   const descRef = useRef();
@@ -82,7 +78,6 @@ const CreateEvent = () => {
   const districtRef = useRef();
   const nameRef = useRef();
   const eventTypeRef = useRef();
-  const storageRef = useRef();
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedCity, setSelectedCity] = useState('');
@@ -90,7 +85,6 @@ const CreateEvent = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const eventRef = collection(firestore, 'events');
-  const storage = getStorage();
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -114,14 +108,15 @@ const CreateEvent = () => {
         eventDate: selectedDate,
         eventTime: `${hourRef.current.value}:${minuteRef.current.value}`,
         eventDescription: descRef.current.value,
-        eventLocation: `${selectedCity}, ${districtRef.current.value}`,
+        eventCity: selectedCity, // Add eventCity field
+        eventDistrict: districtRef.current.value,
         eventName: nameRef.current.value,
         eventType: eventTypeRef.current.value,
         eventImage: image ? await convertImageToBase64(image) : null
       };
-
+  
       const docRef = await addDoc(eventRef, eventData);
-
+  
       console.log('Document written with ID: ', docRef.id);
       setSuccessMessage('Event successfully saved!');
       setSelectedDate(null);
@@ -140,6 +135,7 @@ const CreateEvent = () => {
     }
   };
   
+
   const convertImageToBase64 = (imageFile) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -150,6 +146,7 @@ const CreateEvent = () => {
       reader.readAsDataURL(imageFile);
     });
   };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
@@ -160,7 +157,6 @@ const CreateEvent = () => {
   };
 
   return (
-    
     <FormContainer onSubmit={handleSave}>
       <Label>Enter Event Name</Label>
       <Input type="text" ref={nameRef} required />
@@ -210,7 +206,7 @@ const CreateEvent = () => {
         <option value="" disabled selected>
           Select an event type
         </option>
-        <option value="Party">Concert</option>
+        <option value="Party">Party</option>
         <option value="Concert">Concert</option>
         <option value="Theater">Theatre</option>
         <option value="Camping">Camping</option>
