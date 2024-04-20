@@ -1,17 +1,42 @@
-import React, { useState } from 'react';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; // Import your CSS file for styling
+import './Login.css';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA0pvc_FKN-c5qsY_Lb4tqVGDtK7pz3fbg",
+  authDomain: "localeventure.firebaseapp.com",
+  projectId: "localeventure",
+  storageBucket: "localeventure.appspot.com",
+  messagingSenderId: "952018081316",
+  appId: "1:952018081316:web:d8898e7156da39fb682ab1",
+  measurementId: "G-CDHGZRJMTL"
+};
+
+// Initialize Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // Check if username and password match
-    if (username === 'admin' && password === 'admin') {
-      navigate('/menu'); // Navigate to the 'create-event' route
-    } else {
+  const handleLogin = async () => {
+    try {
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+  
+      if (user) {
+        navigate('/menu'); // Redirect to create-event page if login is successful
+      } else {
+        throw new Error('User not found');
+      }
+    } catch (error) {
+      console.error('Error logging in:', error);
       alert('Invalid username or password');
     }
   };
@@ -21,12 +46,12 @@ const Login = () => {
       <h2>Login</h2>
       <form>
         <div className="form-group">
-          <label htmlFor="username">Username:</label>
+          <label htmlFor="email">Email:</label>
           <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="form-control"
           />
         </div>

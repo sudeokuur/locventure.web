@@ -86,10 +86,10 @@ const Menu = () => {
         <MenuIcon>{isOpen ? '<' : '>'}</MenuIcon>
       </MenuButton>
       <Sidebar isOpen={isOpen}>
-        <SidebarLink to="/create-event">Create Event</SidebarLink>
-        <SidebarLink to="/created-event">Created Event</SidebarLink>
-        <SidebarLink to="/statistics">Statistics</SidebarLink>
-        <SidebarLink to="/add-company-user">Add Company & User</SidebarLink>
+        <SidebarLink to="/create-event" onClick={() => setIsOpen(false)}>Create Event</SidebarLink>
+        <SidebarLink to="/created-events" onClick={() => setIsOpen(false)}>Created Events</SidebarLink>
+        <SidebarLink to="/statistics" onClick={() => setIsOpen(false)}>Statistics</SidebarLink>
+        <SidebarLink to="/add-company-user" onClick={() => setIsOpen(false)}>Add Company & User</SidebarLink>
         {/* Logout Button */}
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       </Sidebar>
@@ -99,4 +99,5 @@ const Menu = () => {
     </React.Fragment>
   );
 };
+
 export default Menu;

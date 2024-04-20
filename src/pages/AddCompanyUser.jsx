@@ -1,6 +1,8 @@
 import { initializeApp } from 'firebase/app';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { addDoc, collection, getDocs, getFirestore } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Tab, Tabs } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css'; // Import CSS for react-tabs
 import styled from 'styled-components';
@@ -13,9 +15,12 @@ const firebaseConfig = {
   storageBucket: "localeventure.appspot.com",
   messagingSenderId: "952018081316",
   appId: "1:952018081316:web:d8898e7156da39fb682ab1",
-  measurementId: "G-CDHGZRJMTL"
+  measurementId: "G-CDHGZRJMTL"
 };
-initializeApp(firebaseConfig);
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const db = getFirestore(firebaseApp);
 
 const Container = styled.div`
   max-width: 600px;
@@ -51,34 +56,42 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
+const Message = styled.p`
+  margin-top: 10px;
+  color: ${({ success }) => (success ? 'green' : 'red')};
+`;
+
 const AddCompanyUser = () => {
   const [companyName, setCompanyName] = useState('');
   const [selectedCompany, setSelectedCompany] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [companies, setCompanies] = useState([]);
+  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompanies = async () => {
-      const db = getFirestore();
-      const querySnapshot = await getDocs(collection(db, 'companies'));
-      const companiesData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setCompanies(companiesData);
+      try {
+        const querySnapshot = await getDocs(collection(db, 'companies'));
+        const companiesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setCompanies(companiesData);
+      } catch (error) {
+        console.error('Error fetching companies: ', error);
+      }
     };
     fetchCompanies();
-  }, []);
+  }, [db]);
 
   const handleAddCompany = async () => {
     try {
-      const db = getFirestore();
-      const docRef = await addDoc(collection(db, 'companies'), {
+      await addDoc(collection(db, 'companies'), {
         companyName: companyName,
       });
-      const companyId = docRef.id;
-      console.log('Company added with ID: ', companyId);
       setCompanyName('');
     } catch (error) {
       console.error('Error adding company: ', error);
@@ -87,17 +100,27 @@ const AddCompanyUser = () => {
 
   const handleAddUser = async () => {
     try {
-      const db = getFirestore();
+      if (password !== confirmPassword) {
+        throw new Error("Passwords don't match");
+      }
+
+      // Create user in Firebase Authentication
+      await createUserWithEmailAndPassword(auth, username, password);
+
+      // Add user to Firestore
       await addDoc(collection(db, 'users'), {
         companyId: selectedCompany,
-        username: username,
-        password: password,
+        email: username,
+        // You can choose not to store the password here for security reasons
       });
-      console.log('User added successfully');
+
+      setMessage('User added successfully');
       setUsername('');
       setPassword('');
+      setConfirmPassword('');
+      navigate('/login'); // Redirect to the login page after successful registration
     } catch (error) {
-      console.error('Error adding user: ', error);
+      setMessage(`Error adding user: ${error.message}`);
     }
   };
 
@@ -138,7 +161,7 @@ const AddCompanyUser = () => {
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                placeholder="Email"
               />
             </FormGroup>
             <FormGroup>
@@ -149,7 +172,16 @@ const AddCompanyUser = () => {
                 placeholder="Password"
               />
             </FormGroup>
+            <FormGroup>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm Password"
+              />
+            </FormGroup>
             <Button onClick={handleAddUser}>Save User</Button>
+            {message && <Message success={message.includes('successfully')}>{message}</Message>}
           </FormContainer>
         </Tab>
       </Tabs>
