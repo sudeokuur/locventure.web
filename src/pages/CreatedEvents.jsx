@@ -1,9 +1,11 @@
 import {
   collection,
+  doc,
   getDocs,
   orderBy,
   query,
-} from '@firebase/firestore';
+  updateDoc
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { firestore } from '../firebase';
@@ -28,6 +30,7 @@ const TableHeader = styled.th`
 
 const TableCell = styled.td`
   padding: 10px;
+  color: ${(props) => (props.current ? '#00cc00' : '#00008b')};
 `;
 
 const PageTitle = styled.h1`
@@ -51,9 +54,24 @@ const SearchButton = styled.button`
   font-size: 16px;
 `;
 
+const EditButton = styled.button`
+  background-color: #007bff;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 10px; /* Added margin */
+`;
+
+const UploadInput = styled.input`
+  margin-top: 10px;
+`;
+
 const CreatedEvents = () => {
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editEvent, setEditEvent] = useState(null);
 
   const loadEvents = async () => {
     const eventsCollection = collection(firestore, 'events');
@@ -79,6 +97,28 @@ const CreatedEvents = () => {
     loadEvents();
   };
 
+  const handleEdit = (eventId) => {
+    const eventToEdit = events.find((event) => event.id === eventId);
+    setEditEvent(eventToEdit);
+  };
+
+  const handleSaveEdit = async () => {
+    try {
+      const eventDocRef = doc(firestore, 'events', editEvent.id);
+      await updateDoc(eventDocRef, {
+        eventDate: editEvent.eventName,
+        eventLocation: editEvent.eventLocation,
+        eventType: editEvent.eventType,
+        eventDate: editEvent.eventDate,
+        // Add other fields you want to update
+      });
+      setEditEvent(null);
+      loadEvents();
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  };
+
   const formatDate = (timestamp) => {
     if (timestamp && timestamp.toDate instanceof Function) {
       const dateObject = timestamp.toDate();
@@ -89,15 +129,11 @@ const CreatedEvents = () => {
       return 'Invalid Date';
     }
   };
+
   const getStatus = (eventDate) => {
     const currentDate = new Date();
     const eventDateTime = eventDate.toDate();
-    
-    if (eventDateTime > currentDate) {
-      return 'Visible';
-    } else {
-      return 'Done';
-    }
+    return eventDateTime > currentDate ? 'CURRENT' : 'PAST';
   };
 
   return (
@@ -121,7 +157,9 @@ const CreatedEvents = () => {
             <TableHeader>Address</TableHeader>
             <TableHeader>Type</TableHeader>
             <TableHeader>Date</TableHeader>
+            <TableHeader>Time</TableHeader>
             <TableHeader>Status</TableHeader>
+            <TableHeader>Edit Event</TableHeader>
           </TableRow>
         </thead>
         <tbody>
@@ -131,11 +169,80 @@ const CreatedEvents = () => {
               <TableCell>{event.eventLocation}</TableCell>
               <TableCell>{event.eventType}</TableCell>
               <TableCell>{formatDate(event.eventDate)}</TableCell>
-              <TableCell>{event.status}</TableCell>
+              <TableCell>{event.eventTime}</TableCell>
+              <TableCell current={getStatus(event.eventDate) === 'CURRENT'}>
+                {getStatus(event.eventDate)}
+              </TableCell>
+              <TableCell>
+                <EditButton onClick={() => handleEdit(event.id)}>Edit</EditButton>
+              </TableCell>
             </TableRow>
           ))}
         </tbody>
       </Table>
+
+      {/* Edit Form */}
+      {editEvent && (
+         <div>
+         <h2>Edit Event</h2>
+         <form>
+           <div>
+             <label>Event Name:</label>
+             <input
+               type="text"
+               value={editEvent.eventName}
+               onChange={(e) => setEditEvent({ ...editEvent, eventName: e.target.value })}
+             />
+           </div>
+           <div>
+             <label>Event Date:</label>
+             <input
+               type="date"
+               value={editEvent.eventDate.toDate().toISOString().substr(0, 10)} // Convert Firestore Timestamp to Date string
+               onChange={(e) => setEditEvent({ ...editEvent, eventDate: new Date(e.target.value) })}
+             />
+           </div>
+           <div>
+             <label>Event Time:</label>
+             <input
+               type="time"
+               value={editEvent.eventTime} // Assuming eventTime is a string in HH:mm format
+               onChange={(e) => setEditEvent({ ...editEvent, eventTime: e.target.value })}
+             />
+           </div>
+           <div>
+             <label>Event Type:</label>
+             <input
+               type="text"
+               value={editEvent.eventType}
+               onChange={(e) => setEditEvent({ ...editEvent, eventType: e.target.value })}
+             />
+           </div>
+           <div>
+             <label>Event Description:</label>
+             <input
+               type="text"
+               value={editEvent.eventDescription}
+               onChange={(e) => setEditEvent({ ...editEvent, eventDescription: e.target.value })}
+             />
+           </div>
+           <div>
+             <label>Event Image:</label>
+             <UploadInput
+               type="file"
+               accept="image/*"
+               onChange={(e) => {
+                 const file = e.target.files[0];
+                 // Handle file upload logic here
+               }}
+             />
+           </div>
+           <div>
+             <button type="button" onClick={handleSaveEdit}>Save</button>
+           </div>
+         </form>
+       </div>
+      )}
     </div>
   );
 };
