@@ -43,7 +43,7 @@ const MenuButton = styled.button`
   z-index: 1100;
   background-color: #111827; /* Lacivert */
   color: #fff;
-  border: 1px solid #fff; /* İnce beyaz çember */
+  border: 5px solid #fff; /* İnce beyaz çember */
   border-radius: 50%;
   width: 50px;
   height: 50px;
