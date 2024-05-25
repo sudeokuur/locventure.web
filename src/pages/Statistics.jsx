@@ -2,6 +2,66 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+
+// Styled Components
+const Container = styled.div`
+  padding: 20px;
+  background: url('/mnt/data/ialperen_resim.jpg') no-repeat center center;
+  background-size: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  margin: 20px auto;
+  backdrop-filter: blur(10px);
+`;
+
+const Title = styled.h2`
+  font-size: 2.5rem;
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 30px;
+  font-family: 'Roboto', sans-serif;
+`;
+
+const StyledTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+  font-family: 'Roboto', sans-serif;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  overflow: hidden;
+  @media (max-width: 600px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const StyledThead = styled.thead`
+  background-color: #34495e;
+  color: white;
+`;
+
+const StyledTh = styled.th`
+  padding: 15px;
+  text-align: left;
+  border-bottom: 2px solid #2c3e50;
+`;
+
+const StyledTd = styled.td`
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
+  
+`;
+
+const TableRow = styled.tr`
+  &:hover {
+    background-color: #ecf0f1;
+    cursor: pointer;
+    transform: scale(1.01);
+  }
+`;
 
 const Statistics = () => {
   const [eventStats, setEventStats] = useState([]);
@@ -34,29 +94,29 @@ const Statistics = () => {
   }, []);
 
   return (
-    <div>
-      <h2>Event Statistics</h2>
-      <table>
-        <thead>
-        <tr style={{ fontSize: '1.2rem' }}>
-  <th style={{ padding: '10px' }}>Event Name</th>
-  <th style={{ padding: '10px' }}>Yes</th>
-  <th style={{ padding: '10px' }}>Maybe</th>
-  <th style={{ padding: '10px' }}>No</th>
-</tr>
-        </thead>
+    <Container>
+      <Title>Event Statistics</Title>
+      <StyledTable>
+        <StyledThead>
+          <tr>
+            <StyledTh>Event Name</StyledTh>
+            <StyledTh>Yes</StyledTh>
+            <StyledTh>Maybe</StyledTh>
+            <StyledTh>No</StyledTh>
+          </tr>
+        </StyledThead>
         <tbody>
           {eventStats.map((event, index) => (
-            <tr key={index}>
-              <td>{event.eventName}</td>
-              <td>{event.responses.yes}</td>
-              <td>{event.responses.maybe}</td>
-              <td>{event.responses.no}</td>
-            </tr>
+            <TableRow key={index}>
+              <StyledTd>{event.eventName}</StyledTd>
+              <StyledTd>{event.responses.yes}</StyledTd>
+              <StyledTd>{event.responses.maybe}</StyledTd>
+              <StyledTd>{event.responses.no}</StyledTd>
+            </TableRow>
           ))}
         </tbody>
-      </table>
-    </div>
+      </StyledTable>
+    </Container>
   );
 };
 

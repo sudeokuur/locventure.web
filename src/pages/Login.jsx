@@ -31,7 +31,7 @@ const Login = () => {
       const user = userCredential.user;
   
       if (user) {
-        navigate('/menu'); // Redirect to create-event page if login is successful
+        navigate('/created-event'); // Redirect to create-event page if login is successful
       } else {
         throw new Error('User not found');
       }

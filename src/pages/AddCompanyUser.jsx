@@ -3,8 +3,8 @@ import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { addDoc, collection, getDocs, getFirestore } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tab, Tabs } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css'; // Import CSS for react-tabs
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 import styled from 'styled-components';
 
 // Initialize Firebase
@@ -15,7 +15,7 @@ const firebaseConfig = {
   storageBucket: "localeventure.appspot.com",
   messagingSenderId: "952018081316",
   appId: "1:952018081316:web:d8898e7156da39fb682ab1",
-  measurementId: "G-CDHGZRJMTL"
+  measurementId: "G-CDHGZRJMTL"
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
@@ -23,9 +23,21 @@ const auth = getAuth(firebaseApp);
 const db = getFirestore(firebaseApp);
 
 const Container = styled.div`
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.8); /* Transparan arka plan */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const PageTitle = styled.h2`
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+  font-family: 'Roboto', sans-serif;
 `;
 
 const FormContainer = styled.div`
@@ -34,6 +46,8 @@ const FormContainer = styled.div`
 
 const FormTitle = styled.h3`
   margin-bottom: 10px;
+  color: #2c3e50;
+  font-size: 1.5rem;
 `;
 
 const FormGroup = styled.div`
@@ -42,18 +56,29 @@ const FormGroup = styled.div`
 
 const Input = styled.input`
   width: 100%;
-  padding: 8px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
 `;
 
 const Button = styled.button`
-  background-color: #4caf50;
+  background-color: #2c3e50; /* Düğme arka plan rengi */
   color: white;
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+
+  &:hover {
+    background-color: #1a252f;
+  }
 `;
 
 const Message = styled.p`
@@ -85,7 +110,7 @@ const AddCompanyUser = () => {
       }
     };
     fetchCompanies();
-  }, [db]);
+  }, []);
 
   const handleAddCompany = async () => {
     try {
@@ -93,8 +118,10 @@ const AddCompanyUser = () => {
         companyName: companyName,
       });
       setCompanyName('');
+      setMessage('Company added successfully');
     } catch (error) {
       console.error('Error adding company: ', error);
+      setMessage(`Error adding company: ${error.message}`);
     }
   };
 
@@ -126,9 +153,14 @@ const AddCompanyUser = () => {
 
   return (
     <Container>
-      <h2>Add Company & User</h2>
+      <PageTitle>Add Company & User</PageTitle>
       <Tabs>
-        <Tab label="Company">
+        <TabList>
+          <Tab>Company</Tab>
+          <Tab>User</Tab>
+        </TabList>
+
+        <TabPanel>
           <FormContainer>
             <FormTitle>Add Company</FormTitle>
             <FormGroup>
@@ -141,12 +173,13 @@ const AddCompanyUser = () => {
             </FormGroup>
             <Button onClick={handleAddCompany}>Save Company</Button>
           </FormContainer>
-        </Tab>
-        <Tab label="User">
+        </TabPanel>
+
+        <TabPanel>
           <FormContainer>
             <FormTitle>Add User</FormTitle>
             <FormGroup>
-              <select
+              <Select
                 value={selectedCompany}
                 onChange={(e) => setSelectedCompany(e.target.value)}
               >
@@ -154,7 +187,7 @@ const AddCompanyUser = () => {
                 {companies.map(company => (
                   <option key={company.id} value={company.id}>{company.companyName}</option>
                 ))}
-              </select>
+              </Select>
             </FormGroup>
             <FormGroup>
               <Input
@@ -183,7 +216,7 @@ const AddCompanyUser = () => {
             <Button onClick={handleAddUser}>Save User</Button>
             {message && <Message success={message.includes('successfully')}>{message}</Message>}
           </FormContainer>
-        </Tab>
+        </TabPanel>
       </Tabs>
     </Container>
   );
