@@ -4,7 +4,6 @@ import { collection, getDocs } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-// Styled Components
 const Container = styled.div`
   padding: 20px;
   background: url('/mnt/data/ialperen_resim.jpg') no-repeat center center;
@@ -52,7 +51,6 @@ const StyledTd = styled.td`
   padding: 15px;
   border-bottom: 1px solid #ddd;
   transition: background-color 0.3s ease;
-  
 `;
 
 const TableRow = styled.tr`
@@ -75,24 +73,32 @@ const Statistics = () => {
           id: doc.id,
           ...doc.data()
         }));
-
-        const stats = eventData.map(event => ({
-          eventName: event.eventName,
-          responses: {
-            yes: event.responses && event.responses['yes'] ? event.responses['yes'].length : 0,
-            maybe: event.responses && event.responses['maybe'] ? event.responses['maybe'].length : 0,
-            no: event.responses && event.responses['no'] ? event.responses['no'].length : 0,
-          },
-        }));
+  
+        const stats = eventData.map(event => {
+          const responses = event.responses || {};
+          const yesCount = responses ? Object.values(responses).filter(response => response === 'yes').length : 0;
+          const maybeCount = responses ? Object.values(responses).filter(response => response === 'maybe').length : 0;
+          const noCount = responses ? Object.values(responses).filter(response => response === 'no').length : 0;
+          
+          return {
+            eventName: event.eventName,
+            responses: {
+              yes: yesCount,
+              maybe: maybeCount,
+              no: noCount,
+            },
+          };
+        });
+  
         setEventStats(stats);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
+  
     fetchData();
   }, []);
-
+  
   return (
     <Container>
       <Title>Event Statistics</Title>
