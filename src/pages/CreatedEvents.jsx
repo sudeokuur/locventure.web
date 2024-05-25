@@ -162,6 +162,7 @@ const CreatedEvents = () => {
       await updateDoc(eventDocRef, {
         eventName: editEvent.eventName,
         eventLocation: editEvent.eventLocation || '', // undefined ise boş string yap
+        eventCity: editEvent.eventCity || '', // undefined ise boş string yap
         eventType: editEvent.eventType,
         eventDate: editEvent.eventDate,
         eventDescription: editEvent.eventDescription || '', // undefined ise boş string yap
@@ -208,7 +209,7 @@ const CreatedEvents = () => {
           <StyledThead>
             <TableRow>
               <StyledTh>Event Name</StyledTh>
-              <StyledTh>Address</StyledTh>
+              <StyledTh>City</StyledTh> {/* Changed "Address" to "City" */}
               <StyledTh>Type</StyledTh>
               <StyledTh>Date</StyledTh>
               <StyledTh>Status</StyledTh>
@@ -219,7 +220,7 @@ const CreatedEvents = () => {
             {events.map((event) => (
               <TableRow key={event.id}>
                 <StyledTd>{event.eventName}</StyledTd>
-                <StyledTd transparent>{event.eventLocation}</StyledTd>
+                <StyledTd transparent>{event.eventCity}</StyledTd> {/* Changed to eventCity */}
                 <StyledTd>{event.eventType}</StyledTd>
                 <StyledTd>{formatDate(event.eventDate)}</StyledTd>
                 <StyledTd status={getStatus(event.eventDate)}>
@@ -268,6 +269,14 @@ const CreatedEvents = () => {
                 type="text"
                 value={editEvent.eventLocation || ''}
                 onChange={(e) => setEditEvent({ ...editEvent, eventLocation: e.target.value })}
+              />
+            </div>
+            <div>
+              <label>Event City:</label> {/* Added eventCity field */}
+              <input
+                type="text"
+                value={editEvent.eventCity || ''}
+                onChange={(e) => setEditEvent({ ...editEvent, eventCity: e.target.value })}
               />
             </div>
             <div>
