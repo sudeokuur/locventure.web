@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, orderBy, query, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { firestore } from '../firebase';
@@ -130,12 +130,12 @@ const CreatedEvents = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [editEvent, setEditEvent] = useState(null);
 
-  const loadEvents = async () => {
+  const loadEvents = async (searchTerm = '') => {
     const eventsCollection = collection(firestore, 'events');
     let eventsQuery = query(eventsCollection);
 
     if (searchTerm) {
-      eventsQuery = query(eventsCollection, orderBy('eventName'));
+      eventsQuery = query(eventsCollection, where('eventName', '>=', searchTerm), where('eventName', '<=', searchTerm + '\uf8ff'), orderBy('eventName'));
     }
 
     const snapshot = await getDocs(eventsQuery);
@@ -145,10 +145,10 @@ const CreatedEvents = () => {
 
   useEffect(() => {
     loadEvents();
-  }, [searchTerm]);
+  }, []);
 
   const handleSearch = () => {
-    loadEvents();
+    loadEvents(searchTerm);
   };
 
   const handleEdit = (eventId) => {

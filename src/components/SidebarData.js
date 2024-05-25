@@ -1,7 +1,6 @@
 import React from "react";
-import * as FaIcons from "react-icons/fa";
 import * as AiIcons from "react-icons/ai";
-import * as IoIcons from "react-icons/io";
+import * as FaIcons from "react-icons/fa";
 
 export const SidebarData = [
   {
@@ -23,9 +22,16 @@ export const SidebarData = [
     cName: "nav-text",
   },
   {
-    title: "AddCompanyUser",
+    title: "Add Company and User",
     path: "/add-company-user",
     icon: <FaIcons.FaBuilding />,
     cName: "nav-text",
+  },
+  {
+    title: "Logout",
+    path: "/logout",
+    icon: <FaIcons.FaOutdent />,
+    cName: "nav-text",
   }
+
 ];
