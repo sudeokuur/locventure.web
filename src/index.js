@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-import { createBrowserRouter, RouterProvider, useNavigate } from 'react-router-dom';
-import Login from './pages/Login';
-import CreateEvent from './pages/CreateEvent';
-import CreatedEvents from './pages/CreatedEvents';
-import AddCompanyUser from './pages/AddCompanyUser';
-import Statistics from './pages/Statistics';
+import { createBrowserRouter, Outlet, RouterProvider, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import { Outlet } from 'react-router-dom';
+import './index.css';
+import AddCompanyUser from './pages/AddCompanyUser';
+import CreatedEvents from './pages/CreatedEvents';
+import CreateEvent from './pages/CreateEvent';
+import Login from './pages/Login';
+import Logout from './pages/Logout';
+import Statistics from './pages/Statistics';
+import reportWebVitals from './reportWebVitals';
 
 const AppLayout = () => (
   <>
@@ -52,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "statistics",
         element: <Statistics />
+      },
+      {
+        path: "logout",
+        element: <Logout />
       },
     ],
   },

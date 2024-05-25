@@ -6,12 +6,21 @@
 }
 
 .login-container {
-  max-width: 400px;
+  max-width: 350px; /* Adjust the maximum width as needed */
+  width: 80%; /* Set the width to 80% of the parent container */
   margin: auto;
-  padding: 20px;
+  padding: 2px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 20px;
   background-color: #f9f9f9;
+  box-sizing: border-box; /* Ensure padding is included in the width calculation */
+
+  /* Center the login container */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh; /* Set the height to 80% of the viewport height */
 }
 
 .form-group {

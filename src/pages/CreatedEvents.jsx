@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { firestore } from '../firebase';
@@ -129,17 +129,25 @@ const CreatedEvents = () => {
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [editEvent, setEditEvent] = useState(null);
+  const [searchResultMessage, setSearchResultMessage] = useState('');
 
   const loadEvents = async (searchTerm = '') => {
     const eventsCollection = collection(firestore, 'events');
     let eventsQuery = query(eventsCollection);
 
     if (searchTerm) {
-      eventsQuery = query(eventsCollection, where('eventName', '>=', searchTerm), where('eventName', '<=', searchTerm + '\uf8ff'), orderBy('eventName'));
+      eventsQuery = query(eventsCollection, where('eventName', '>=', searchTerm), where('eventName', '<=', searchTerm + '\uf8ff'));
     }
 
     const snapshot = await getDocs(eventsQuery);
     const eventsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    if (eventsData.length === 0) {
+      setSearchResultMessage('Event has not been found.');
+    } else {
+      setSearchResultMessage('');
+    }
+
     setEvents(eventsData);
   };
 
@@ -204,6 +212,7 @@ const CreatedEvents = () => {
         <SearchButton onClick={handleSearch}>Search</SearchButton>
       </SearchContainer>
 
+      {searchResultMessage && <div>{searchResultMessage}</div>}
       <TableContainer>
         <StyledTable>
           <StyledThead>
